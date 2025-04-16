@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { EMAIL_PROVIDER, COUNTRY, PASSWORD } from '../../../lib/auth-params';
+import { EMAIL_PROVIDER } from '../../../utils/auth-params';
 import { getTemporaryEmail } from '../../../services-external/getTemporaryEmail.service';
-import { AuthRegisterPage } from '../pages/auth-register.page';
+import { AuthRegisterPage } from '../../../pages/auth-register.page';
 
+test.use({ storageState: { cookies: [], origins: [] } });
 test('Registro de usuario con correo temporal', async ({ page }) => {
   const authRegisterPage = new AuthRegisterPage(page);
 
@@ -14,12 +15,13 @@ test('Registro de usuario con correo temporal', async ({ page }) => {
   await authRegisterPage.register(
     temporaryEmail + EMAIL_PROVIDER,
     temporaryEmail,
-    PASSWORD,
-    COUNTRY,
+    process.env.PASSWORD || '',
+    'Perú',
     true,
     true
   );
 
+  await page.waitForTimeout(5000);
   await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -40,9 +42,14 @@ test('Registro de usuario con correo temporal', async ({ page }) => {
     if (emailCount > 0) {
       emailFound = true;
       break;
-    }else{
-      await refreshButtonLocator.click();
-      await page.waitForTimeout(2000); 
+    } else {
+      const refreshButtonCount = await refreshButtonLocator.count();
+      if (refreshButtonCount > 0) {
+        await refreshButtonLocator.click();
+      } else {
+        console.log('boton refresh no encontrado, buscar email');
+      }
+      await page.waitForTimeout(2000);
     }
 
     attempt++;
@@ -55,11 +62,50 @@ test('Registro de usuario con correo temporal', async ({ page }) => {
     const confirmationLinkLocator = iframe.getByRole('link', { name: 'Confirmar Cuenta' });
     await confirmationLinkLocator.click();
 
-    //const goToBoardButton = page.locator('button', { hasText: 'Go to the board' });
-    //await goToBoardButton.click();
- 
   } else {
     throw new Error('No se encontró el correo después de varios intentos');
   }
 
+});
+
+test('Intento de registro sin aceptar términos y cookies', async ({ page }) => {
+  const authRegisterPage = new AuthRegisterPage(page);
+
+  const temporaryEmail = await getTemporaryEmail(page);
+  console.log('Temporary email:', temporaryEmail + EMAIL_PROVIDER);
+
+  await authRegisterPage.openApplication();
+
+  await authRegisterPage.register(
+    temporaryEmail + EMAIL_PROVIDER,
+    temporaryEmail,
+    process.env.PASSWORD || '',
+    'Perú',
+    false,
+    false
+  );
+
+  const submitButton = authRegisterPage.submitButton;
+  await expect(submitButton).toHaveAttribute('disabled');
+});
+
+test('Intento de registro sin llenar todos los campos', async ({ page }) => {
+  const authRegisterPage = new AuthRegisterPage(page);
+
+  await authRegisterPage.openApplication();
+
+  await authRegisterPage.register(
+    '',
+    '',
+    process.env.PASSWORD || '',
+    'Perú',
+    true,
+    true
+  );
+
+  const emailError = await page.locator('text=Email Address is required');
+  await expect(emailError).toBeVisible();
+
+  const firstName = await page.locator('text=First Name is required');
+  await expect(firstName).toBeVisible();
 });

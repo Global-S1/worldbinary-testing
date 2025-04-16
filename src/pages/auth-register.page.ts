@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import { PageBase } from '../../../common/page-base';
+import { PageBase } from '../common/page-base';
 
 export class AuthRegisterPage extends PageBase {
     readonly emailInput: Locator;
@@ -26,10 +26,6 @@ export class AuthRegisterPage extends PageBase {
         this.submitButton = page.locator('button[type="submit"]');
     }
 
-    async openApplication(){
-        await this.page.goto('https://qa.worldbinary.pro/auth/register');
-    }
-
     async selectCountry(countryName: string) {
         await this.countrySelect.click();
         await this.countryOption(countryName).click();
@@ -52,7 +48,8 @@ export class AuthRegisterPage extends PageBase {
         if (acceptTerms)    await this.acceptTermsCheckbox.check();
         if (acceptCookies)  await this.acceptCookiesCheckbox.check();
 
+        if(acceptCookies && acceptTerms) {
         await this.submitButton.click();
-        
+        }
     }
 }

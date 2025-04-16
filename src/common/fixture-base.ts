@@ -1,12 +1,14 @@
 import { test as baseTest } from '@playwright/test';
-import { AuthLoginPage } from '../modules/auth/pages/auth-login.page';
-import { TradingPage } from '../modules/trading/pages/trading.page';
-import { AuthRegisterPage } from '../modules/auth/pages/auth-register.page';
+import { AuthLoginPage } from '../pages/auth.page';
+import { TradingPage } from '../pages/trading.page';
+import { AuthRegisterPage } from '../pages/auth-register.page';
+import { HistoryPage } from '../pages/history.page';
 
 type FixtureBase = {
     loginPage: AuthLoginPage;
     registerPage: AuthRegisterPage;
     tradingPage: TradingPage;
+    historyPage: HistoryPage;
 }
 
 export const test = baseTest.extend<FixtureBase>({
@@ -18,6 +20,9 @@ export const test = baseTest.extend<FixtureBase>({
     },
     tradingPage: async ({ page }, use) => {
         await use(new TradingPage(page));
+    },
+    historyPage: async ({ page }, use) => {
+        await use(new HistoryPage(page));
     },
 });
 

@@ -5,3 +5,8 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+src/setup/sessions/*
+!src/setup/sessions/.gitkeep
+
+.env
