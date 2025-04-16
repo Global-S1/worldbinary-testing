@@ -1,4 +1,5 @@
 import { test } from '../../../common/fixture-base';
+import { ASSET_TYPE, PAIR, TIME, INVESTMENT, TYPE_OPERATION } from '../../../config/params';
 
 test('Registro de la compra-venta y verificación del balance', async ({
     tradingPage,
@@ -6,10 +7,10 @@ test('Registro de la compra-venta y verificación del balance', async ({
 }) => {
     await tradingPage.openApplication();
     await tradingPage.showBalanceBtn.click();
-    await tradingPage.setPair(process.env.ASSET_TYPE || '', process.env.PAIR || '');
+    await tradingPage.setPair(ASSET_TYPE, PAIR);
 
-    await tradingPage.setInvestment(Number(process.env.INVESTMENT )|| 0);
-    await tradingPage.setTime(process.env.TIME || '');
+    await tradingPage.setInvestment(INVESTMENT);
+    await tradingPage.setTime(TIME);
 
     const initialBalance = await tradingPage.getBalance();
     console.log(`Initial Balance: ${initialBalance}`);
@@ -18,8 +19,8 @@ test('Registro de la compra-venta y verificación del balance', async ({
     const investment = await tradingPage.getInvestment();
     console.log(`Investment: ${investment}`);
 
-    await tradingPage.startOperation(process.env.TYPE_OPERATION || '');
-    const idOperation = await tradingPage.getInfoOperationOpen(process.env.PAIR || '');
+    await tradingPage.startOperation(TYPE_OPERATION);
+    const idOperation = await tradingPage.getInfoOperationOpen(PAIR);
 
     const balanceAfterOperation = await tradingPage.getBalance();
     console.log(`balance after operation: ${balanceAfterOperation}`);
@@ -29,7 +30,7 @@ test('Registro de la compra-venta y verificación del balance', async ({
 
     await tradingPage.openApplication();
     await tradingPage.showBalanceBtn.click();
-    await tradingPage.checkInfoOperationClosed(idOperation, process.env.TIME || '');
+    await tradingPage.checkInfoOperationClosed(idOperation,TIME);
 
     const finalBalance = await tradingPage.getBalance();
     console.log(`final Balance: ${finalBalance}`);

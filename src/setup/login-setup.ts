@@ -1,22 +1,25 @@
 import { chromium, firefox, webkit } from '@playwright/test';
 import { AuthLoginPage } from '../pages/auth.page';
+import { EMAIL, PASSWORD } from '../config/params';
 
 async function loginAndSaveStorageState(browserType, fileName: string) {
-  const browser = await browserType.launch({ headless: false });
+  const browser = await browserType.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
 
   const loginPage = new AuthLoginPage(page);
   await loginPage.openApplication();
-  await loginPage.login(process.env.EMAIL || '', process.env.PASSWORD || '');
+  await loginPage.login(EMAIL, PASSWORD);
 
   const yopmailPage = await context.newPage();
   await yopmailPage.goto('https://yopmail.com/es/');
-  await yopmailPage.locator('input#login').fill(process.env.EMAIL || '');
+  await yopmailPage.waitForTimeout(5000);
+  await yopmailPage.locator('input#login').fill(EMAIL);
   await yopmailPage.getByRole('button', { name: '' }).click();
   await yopmailPage.waitForTimeout(4000);
 
   const frame = await yopmailPage.frameLocator('iframe#ifmail');
+  await frame.locator('body').waitFor({ state: 'visible', timeout: 60000 });
   const fullText = await frame.locator('body').innerText();
   const code = fullText.match(/\d{6}/)?.[0];
 
