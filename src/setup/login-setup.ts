@@ -1,5 +1,6 @@
 import { chromium, firefox, webkit } from '@playwright/test';
 import { AuthLoginPage } from '../pages/auth.page';
+import { EMAIL, PASSWORD } from '../config/params';
 
 async function loginAndSaveStorageState(browserType, fileName: string) {
   const browser = await browserType.launch({ headless: false });
@@ -8,11 +9,11 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
 
   const loginPage = new AuthLoginPage(page);
   await loginPage.openApplication();
-  await loginPage.login(process.env.EMAIL || '', process.env.PASSWORD || '');
+  await loginPage.login(EMAIL, PASSWORD);
 
   const yopmailPage = await context.newPage();
   await yopmailPage.goto('https://yopmail.com/es/');
-  await yopmailPage.locator('input#login').fill(process.env.EMAIL || '');
+  await yopmailPage.locator('input#login').fill(EMAIL);
   await yopmailPage.getByRole('button', { name: '' }).click();
   await yopmailPage.waitForTimeout(4000);
 

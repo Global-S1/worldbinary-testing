@@ -1,5 +1,6 @@
 import { test, expect } from '../../../common/fixture-base';
 import { YopmailPage } from '../../../services-external/yopmail.page';
+import { EMAIL, PASSWORD } from '../../../config/params';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 test('Inicio de sesión exitoso con 2FA', async ({
@@ -8,15 +9,13 @@ test('Inicio de sesión exitoso con 2FA', async ({
 }) => {
 
   await loginPage.openApplication();
-  await loginPage.login(
-    process.env.EMAIL || '', 
-    process.env.PASSWORD || '', 
+  await loginPage.login(EMAIL,PASSWORD, 
   );
   await expect(loginPage.otpInputs.first()).toBeVisible();
   
   const yopmailPage = new YopmailPage(await context.newPage());
   await yopmailPage.open();
-  await yopmailPage.checkInbox(process.env.EMAIL || '');
+  await yopmailPage.checkInbox(EMAIL);
   const code = await yopmailPage.get2FACode();
   
   await loginPage.page.bringToFront();

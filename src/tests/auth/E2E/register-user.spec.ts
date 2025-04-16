@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { EMAIL_PROVIDER } from '../../../utils/auth-params';
+import { EMAIL_PROVIDER } from '../../../config/params';
 import { getTemporaryEmail } from '../../../services-external/getTemporaryEmail.service';
 import { AuthRegisterPage } from '../../../pages/auth-register.page';
 
