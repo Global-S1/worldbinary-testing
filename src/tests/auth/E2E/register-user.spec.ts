@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { EMAIL_PROVIDER } from '../../../config/params';
+import { EMAIL_PROVIDER, PASSWORD } from '../../../config/params';
 import { getTemporaryEmail } from '../../../services-external/getTemporaryEmail.service';
 import { AuthRegisterPage } from '../../../pages/auth-register.page';
 
@@ -15,7 +15,7 @@ test('Registro de usuario con correo temporal', async ({ page }) => {
   await authRegisterPage.register(
     temporaryEmail + EMAIL_PROVIDER,
     temporaryEmail,
-    process.env.PASSWORD || '',
+    PASSWORD,
     'Perú',
     true,
     true
@@ -25,6 +25,7 @@ test('Registro de usuario con correo temporal', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  await page.waitForTimeout(5000);
   await expect(page.getByRole('button', { name: 'Operate Now' })).toBeVisible();
   await page.getByRole('button', { name: 'Operate Now' }).click();
 
@@ -79,7 +80,7 @@ test('Intento de registro sin aceptar términos y cookies', async ({ page }) => 
   await authRegisterPage.register(
     temporaryEmail + EMAIL_PROVIDER,
     temporaryEmail,
-    process.env.PASSWORD || '',
+    PASSWORD,
     'Perú',
     false,
     false
@@ -97,7 +98,7 @@ test('Intento de registro sin llenar todos los campos', async ({ page }) => {
   await authRegisterPage.register(
     '',
     '',
-    process.env.PASSWORD || '',
+    PASSWORD,
     'Perú',
     true,
     true

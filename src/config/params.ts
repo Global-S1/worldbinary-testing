@@ -1,6 +1,6 @@
 import { workspaces } from "./enums";
 
-export const WORKSPACE: workspaces = workspaces.QA;
+export const WORKSPACE: workspaces = workspaces.DEV;
 
 // temporary email
 export const EMAIL_PROVIDER = "@inboxkitten.com";
