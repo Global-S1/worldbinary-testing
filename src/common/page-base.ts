@@ -1,10 +1,10 @@
 import { Page } from "@playwright/test";
-import { workspaces } from "../lib/enums";
+import { workspaces } from "../utils/enums";
 
 export class PageBase {
     readonly page: Page;
     readonly protocol: string = "https://";
-    readonly workspace: string = workspaces.QA;
+    readonly workspace: string = process.env.WORKSPACE ?? workspaces.QA;
     readonly domain: string = "worldbinary.pro";
     protected path: string;
 
@@ -13,7 +13,7 @@ export class PageBase {
         this.path = path;
     }
 
-    async openApplication() {
-        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}`);
+    async openApplication(subpath?: string) {
+        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}/${subpath ?? ''}`);
     }
 }

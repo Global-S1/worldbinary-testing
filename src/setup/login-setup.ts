@@ -1,6 +1,5 @@
 import { chromium, firefox, webkit } from '@playwright/test';
-import { EMAIL, PASSWORD } from '../lib/auth-params';
-import { AuthLoginPage } from '../modules/auth/pages/auth-login.page';
+import { AuthLoginPage } from '../pages/auth.page';
 
 async function loginAndSaveStorageState(browserType, fileName: string) {
   const browser = await browserType.launch({ headless: false });
@@ -9,11 +8,11 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
 
   const loginPage = new AuthLoginPage(page);
   await loginPage.openApplication();
-  await loginPage.login(EMAIL, PASSWORD);
+  await loginPage.login(process.env.EMAIL || '', process.env.PASSWORD || '');
 
   const yopmailPage = await context.newPage();
   await yopmailPage.goto('https://yopmail.com/es/');
-  await yopmailPage.locator('input#login').fill(EMAIL);
+  await yopmailPage.locator('input#login').fill(process.env.EMAIL || '');
   await yopmailPage.getByRole('button', { name: '' }).click();
   await yopmailPage.waitForTimeout(4000);
 
@@ -26,14 +25,13 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
   }
 
   await page.bringToFront();
+  await page.waitForTimeout(2000);
   const inputs = await page.locator('input[type="number"]');
   for (let i = 0; i < code.length; i++) {
     await inputs.nth(i).fill(code[i]);
   }
 
   await page.waitForTimeout(5000);
-  const user = await page.evaluate(() => localStorage.getItem('current-user'));
-  console.log(`[${fileName}] current-user:`, user);
 
   await context.storageState({ path: fileName });
   console.log(`✅ ${fileName} guardado con éxito.`);
@@ -41,7 +39,7 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
 }
 
 (async () => {
-  await loginAndSaveStorageState(chromium, 'storageState.chromium.json');
-  await loginAndSaveStorageState(firefox, 'storageState.firefox.json');
-  await loginAndSaveStorageState(webkit, 'storageState.webkit.json');
+  await loginAndSaveStorageState(chromium, 'src/setup/sessions/storageState.chromium.json');
+  await loginAndSaveStorageState(firefox, 'src/setup/sessions/storageState.firefox.json');
+  await loginAndSaveStorageState(webkit, 'src/setup/sessions/storageState.webkit.json');
 })();
