@@ -1,35 +1,59 @@
-import { chromium, firefox, webkit } from '@playwright/test';
+import { chromium, expect, firefox, webkit } from '@playwright/test';
 import { AuthLoginPage } from '../pages/auth.page';
+import { PASSWORD } from '../config/params';
+import { AuthRegisterPage } from '../pages/auth-register.page';
+import { InboxKittenPage } from '../services-external/inboxkitten.page';
 
 async function loginAndSaveStorageState(browserType, fileName: string) {
-  const browser = await browserType.launch({ headless: false });
+  
+  const browser = await browserType.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  const inboxKittenPage = new InboxKittenPage(await context.newPage());
+  await inboxKittenPage.open();
+  const temporaryEmail = await inboxKittenPage.getTemporaryEmail();
+  console.log('Temporary email:', temporaryEmail + "@inboxkitten.com");
+
+  const registerPage = new AuthRegisterPage(page);
+  registerPage.openApplication();
+  await registerPage.page.bringToFront();
+  await registerPage.register(
+    temporaryEmail + "@inboxkitten.com",
+    temporaryEmail,
+    PASSWORD,
+    'Perú',
+    true,
+    true
+  );
+
+  const timeout = browserType.name() === 'webkit' ?  60000 : 30000;
+  await expect(registerPage.page.getByRole('button', { name: 'Continue' })).toBeVisible({ timeout });
+  await registerPage.page.getByRole('button', { name: 'Continue' }).click();
+
+  await registerPage.page.waitForTimeout(5000);
+  await expect(registerPage.page.getByRole('button', { name: 'Operate Now' })).toBeVisible({ timeout });
+  await registerPage.page.getByRole('button', { name: 'Operate Now' }).click();
+
+  await inboxKittenPage.page.bringToFront();
+  await inboxKittenPage.runToRegister(temporaryEmail);
+
   const loginPage = new AuthLoginPage(page);
   await loginPage.openApplication();
-  await loginPage.login(process.env.EMAIL || '', process.env.PASSWORD || '');
+  await loginPage.page.bringToFront();
+  await registerPage.page.waitForTimeout(5000);
+  await loginPage.login(temporaryEmail + "@inboxkitten.com", PASSWORD);
 
-  const yopmailPage = await context.newPage();
-  await yopmailPage.goto('https://yopmail.com/es/');
-  await yopmailPage.locator('input#login').fill(process.env.EMAIL || '');
-  await yopmailPage.getByRole('button', { name: '' }).click();
-  await yopmailPage.waitForTimeout(4000);
+ // Obtener el código 2FA desde InboxKitten
+  await inboxKittenPage.page.bringToFront();
+  await inboxKittenPage.navigateToInbox(temporaryEmail);
+  await inboxKittenPage.page.waitForTimeout(2000);
+  await inboxKittenPage.page.getByRole('button', { name: 'Refresh' }).click();
+  const code = await inboxKittenPage.get2FACode();
 
-  const frame = await yopmailPage.frameLocator('iframe#ifmail');
-  const fullText = await frame.locator('body').innerText();
-  const code = fullText.match(/\d{6}/)?.[0];
-
-  if (!code) {
-    throw new Error('No se encontró el código 2FA en el correo');
-  }
-
-  await page.bringToFront();
-  await page.waitForTimeout(2000);
-  const inputs = await page.locator('input[type="number"]');
-  for (let i = 0; i < code.length; i++) {
-    await inputs.nth(i).fill(code[i]);
-  }
+  // Completar el inicio de sesión con el código 2FA
+  await loginPage.page.bringToFront();
+  await loginPage.fillOtpCode(code);
 
   await page.waitForTimeout(5000);
 

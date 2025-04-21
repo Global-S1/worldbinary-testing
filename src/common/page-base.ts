@@ -1,10 +1,10 @@
 import { Page } from "@playwright/test";
-import { workspaces } from "../utils/enums";
+import { WORKSPACE } from "../config/params";
 
 export class PageBase {
     readonly page: Page;
     readonly protocol: string = "https://";
-    readonly workspace: string = process.env.WORKSPACE ?? workspaces.QA;
+    readonly workspace: string = WORKSPACE;
     readonly domain: string = "worldbinary.pro";
     protected path: string;
 
@@ -14,6 +14,7 @@ export class PageBase {
     }
 
     async openApplication(subpath?: string) {
-        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}/${subpath ?? ''}`);
+        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}/${subpath ?? ''}`
+        );
     }
 }

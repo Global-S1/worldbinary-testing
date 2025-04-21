@@ -5,6 +5,8 @@ import { fechaLocal } from "../utils/getDate";
 
 export class TradingPage extends PageBase {
     readonly showBalanceBtn: Locator;
+    readonly desplayTypeAccount: Locator;
+    readonly selectTypeAccount: Locator;
     readonly balanceText: Locator;
     readonly pairListBtn: Locator;
     readonly pairType: Locator;
@@ -25,6 +27,8 @@ export class TradingPage extends PageBase {
     constructor(page: Page) {
         super(page, 'trading');
         this.showBalanceBtn = page.locator("header").getByRole('button').filter({ hasText: /^$/ }).nth(1);
+        this.desplayTypeAccount = page.locator('header').getByRole('img').nth(1);
+        this.selectTypeAccount = page.getByRole('listitem');
         this.balanceText = page.locator("header").getByText('$');
         this.pairListBtn = page.locator('#dropdownSearchButton');
         this.pairType = page.getByRole('listitem');
@@ -41,6 +45,12 @@ export class TradingPage extends PageBase {
         this.ClosedOperationBtn = page.getByRole('button', { name: 'Closed' })
         this.listOperationToDay = page.getByText(fechaLocal);
         this.containerOperations = page.locator('div.flex.flex-col.gap-3');
+    }
+
+    async selectAccount(){
+        await this.desplayTypeAccount.click();
+        await this.page.waitForTimeout(2000);
+        await this.selectTypeAccount.filter({ hasText: 'Demo account$' }).locator('div').first().click();
     }
 
     async getBalance() {
