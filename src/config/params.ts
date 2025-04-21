@@ -1,9 +1,10 @@
+import { generateRandomEmail } from "../utils/generateRandomEmail";
 import { workspaces } from "./enums";
 
-export const WORKSPACE: workspaces = workspaces.DEV;
+export const WORKSPACE: workspaces = workspaces.QA;
 
 // temporary email
-export const EMAIL_PROVIDER = "@inboxkitten.com";
+export const TEMPORARY_EMAIL = generateRandomEmail();
 
 // auth 
 export const EMAIL="globals1test@yopmail.com";

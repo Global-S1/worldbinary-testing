@@ -7,8 +7,8 @@ test('Registro de la compra-venta y verificación del balance', async ({
 }) => {
     await tradingPage.openApplication();
     await tradingPage.showBalanceBtn.click();
+    await tradingPage.selectAccount();
     await tradingPage.setPair(ASSET_TYPE, PAIR);
-
     await tradingPage.setInvestment(INVESTMENT);
     await tradingPage.setTime(TIME);
 

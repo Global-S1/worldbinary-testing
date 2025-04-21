@@ -14,8 +14,7 @@ export class PageBase {
     }
 
     async openApplication(subpath?: string) {
-        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}/${subpath ?? ''}`,
-            { timeout: 600000 }
+        await this.page.goto(`${this.protocol}${this.workspace}.${this.domain}/${this.path}/${subpath ?? ''}`
         );
     }
 }
