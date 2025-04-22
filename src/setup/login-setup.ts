@@ -5,7 +5,7 @@ import { AuthRegisterPage } from '../pages/auth-register.page';
 import { InboxKittenPage } from '../services-external/inboxkitten.page';
 
 async function loginAndSaveStorageState(browserType, fileName: string) {
-  
+  const timeout = browserType.name() === 'webkit' ?  60000 : 30000;
   const browser = await browserType.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -16,6 +16,7 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
   console.log('Temporary email:', temporaryEmail + "@inboxkitten.com");
 
   const registerPage = new AuthRegisterPage(page);
+  (browserType.name() === 'webkit') ? registerPage.page.waitForTimeout(60000) : registerPage.page.waitForTimeout(30000);
   registerPage.openApplication();
   await registerPage.page.bringToFront();
   await registerPage.register(
@@ -27,7 +28,7 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
     true
   );
 
-  const timeout = browserType.name() === 'webkit' ?  60000 : 30000;
+  
   await expect(registerPage.page.getByRole('button', { name: 'Continue' })).toBeVisible({ timeout });
   await registerPage.page.getByRole('button', { name: 'Continue' }).click();
 
@@ -44,14 +45,14 @@ async function loginAndSaveStorageState(browserType, fileName: string) {
   await registerPage.page.waitForTimeout(5000);
   await loginPage.login(temporaryEmail + "@inboxkitten.com", PASSWORD);
 
- // Obtener el código 2FA desde InboxKitten
+ //Obtener el código 2FA desde InboxKitten
   await inboxKittenPage.page.bringToFront();
   await inboxKittenPage.navigateToInbox(temporaryEmail);
   await inboxKittenPage.page.waitForTimeout(2000);
   await inboxKittenPage.page.getByRole('button', { name: 'Refresh' }).click();
   const code = await inboxKittenPage.get2FACode();
 
-  // Completar el inicio de sesión con el código 2FA
+  //Completar el inicio de sesión con el código 2FA
   await loginPage.page.bringToFront();
   await loginPage.fillOtpCode(code);
 

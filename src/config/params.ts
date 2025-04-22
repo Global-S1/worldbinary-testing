@@ -7,7 +7,6 @@ export const WORKSPACE: workspaces = workspaces.QA;
 export const TEMPORARY_EMAIL = generateRandomEmail();
 
 // auth 
-export const EMAIL="globals1test@yopmail.com";
 export const PASSWORD="Holaquehace123*";
 
 // trading
