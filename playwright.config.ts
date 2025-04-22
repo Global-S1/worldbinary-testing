@@ -36,14 +36,9 @@ export default defineConfig({
     // storageState: 'storageState.json',
     // permissions: ['geolocation', 'camera', 'microphone'],
     // userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    /*
-    networkConditions: {
-    offline: false,
-    downloadThroughput: 1 * 1024 * 1024,  // 1 Mbps
-    uploadThroughput: 1 * 1024 * 1024,    // 1 Mbps
-    latency: 40,  // 40ms de latencia
-    },
-    */
+   
+ 
+ 
   },
   outputDir: 'test-results/',
 

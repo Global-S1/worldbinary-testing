@@ -9,9 +9,12 @@
     "test:firefox": "npx playwright test --project=firefox",
     "test:webkit": "npx playwright test --project=webkit",
     "codegen": "npx playwright codegen",
-    "ui": "npx playwright test --ui",
+    "codegen:chromium": "npx playwright codegen --browser=chromium",
+    "codegen:firefox": "npx playwright codegen --browser=firefox",
+    "codegen:webkit": "npx playwright codegen --browser=webkit",
     "report": "npx playwright show-report",
-    "session": "npx tsx src/setup/login-setup.ts"
+    "session": "npx tsx src/setup/login-setup.ts",
+    "ui": "npx playwright test --ui"
   },
   "keywords": [],
   "author": "",

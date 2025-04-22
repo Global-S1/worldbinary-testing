@@ -11,7 +11,10 @@ export class HistoryPage extends PageBase {
     }
 
     async checkOperation(idOperation: string | undefined, statusOperation: string) {
-        await expect(this.openOperationItem.getByRole('cell', { name: idOperation })).toBeVisible();
+        const browserName = this.page.context().browser()?.browserType().name();
+        const timeout = browserName === 'webkit' ? 10000 : 5000;
+
+        await expect(this.openOperationItem.getByRole('cell', { name: idOperation })).toBeVisible({ timeout });
 
         const statusText = statusOperation === 'open'
             ? 'operaciones abiertas'

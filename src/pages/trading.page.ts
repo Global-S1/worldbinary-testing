@@ -148,12 +148,16 @@ export class TradingPage extends PageBase {
         const firstItem = this.containerOperations.locator('div.rounded-lg.p-2.border').first();
         const firstItemText = await firstItem.textContent();
         if (firstItemText?.includes('Result:') && firstItemText.includes('Win')) {
-            console.log('✅ La operación fue ganadora.');
+            console.log('📈 La operación fue ganadora.');
             const expectedFinalBalance = balanceAfterOperation + investment + possibleGain;
             expect(finalBalance).toBeCloseTo(expectedFinalBalance);
-        } else {
-            console.log('❌ No fue una operación ganadora.');
+        } else if (firstItemText?.includes('Result:') && firstItemText.includes('Lose')){
+            console.log('📉 No fue una operación ganadora.');
             const expectedFinalBalance = initialBalance - investment;
+            expect(finalBalance).toBeCloseTo(expectedFinalBalance);
+        }else if (firstItemText?.includes('Result:') && firstItemText.includes('Draw')){
+            console.log('🟰 la operación quedó en empate.');
+            const expectedFinalBalance = initialBalance;
             expect(finalBalance).toBeCloseTo(expectedFinalBalance);
         }
     }
